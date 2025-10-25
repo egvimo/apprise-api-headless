@@ -14,13 +14,15 @@ def get_apprise_instance(config_dir: str, config_key: str) -> Optional[Apprise]:
         return None
 
     config_path = None
-    # Ensure config_key does not escape config_dir via path traversal
     for ext in ["yml", "yaml"]:
         candidate_path = os.path.join(config_dir, f"{config_key}.{ext}")
         norm_candidate_path = os.path.normpath(os.path.abspath(candidate_path))
         norm_config_dir = os.path.normpath(os.path.abspath(config_dir))
+
+        # Ensure config_key does not escape config_dir via path traversal
         if not norm_candidate_path.startswith(norm_config_dir + os.sep):
             continue
+
         if os.path.isfile(norm_candidate_path):
             config_path = norm_candidate_path
             break

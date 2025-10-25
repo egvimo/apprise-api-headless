@@ -1,12 +1,12 @@
 # Python-generated files
 __pycache__/
-*.py[oc]
 build/
 dist/
 wheels/
 *.egg-info
+*.py[oc]
 
-# Virtual environments
+# Environments
 .venv
 
 # Ruff
