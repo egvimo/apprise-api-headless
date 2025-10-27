@@ -22,6 +22,9 @@ dev = [
 [tool.setuptools]
 packages = ["apprise_api_headless"]
 
+[tool.ruff.lint]
+extend-select = ["E", "W", "I", "B", "Q"]
+
 [tool.pytest.ini_options]
 pythonpath = ["."]
 log_cli = true

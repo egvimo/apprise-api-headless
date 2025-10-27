@@ -14,6 +14,7 @@ RUN addgroup -g 1000 apprise \
 
 WORKDIR /apprise/app
 
+COPY config config/
 COPY --from=builder /build/.venv .venv/
 COPY apprise_api_headless apprise_api_headless/
 RUN chown -R apprise:apprise /apprise
@@ -24,4 +25,4 @@ ENV APPRISE_CONFIG_DIR="/apprise/config"
 
 EXPOSE 8000
 
-CMD ["/apprise/app/.venv/bin/fastapi", "run", "apprise_api_headless/main.py", "--proxy-headers"]
+CMD ["/apprise/app/.venv/bin/uvicorn", "apprise_api_headless.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers", "--log-config", "config/log_config.yaml"]

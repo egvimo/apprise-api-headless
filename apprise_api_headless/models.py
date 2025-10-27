@@ -10,7 +10,7 @@ class StatusResponse(BaseModel):
 class NotifyRequest(BaseModel):
     title: Optional[str] = None
     body: str
-    tag: str = "all"
+    tag: Optional[str] = "all"
 
 
 class NotifyResponse(BaseModel):

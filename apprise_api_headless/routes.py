@@ -39,18 +39,15 @@ async def post_notify(
     )
 
     if not apprise_instance:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Apprise config {config_key} not found in {settings.apprise_config_dir}",
-        )
+        msg = f"Apprise config {config_key} not found in {settings.apprise_config_dir}"
+        raise HTTPException(status_code=404, detail=msg)
 
     result = await apprise_instance.async_notify(
         title=notify_request.title, body=notify_request.body, tag=notify_request.tag
     )
 
     if not result:
-        raise HTTPException(
-            status_code=424, detail="One or more notification could not be sent"
-        )
+        msg = "One or more notification could not be sent"
+        raise HTTPException(status_code=424, detail=msg)
 
     return NotifyResponse(success=result)
