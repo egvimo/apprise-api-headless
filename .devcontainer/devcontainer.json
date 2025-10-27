@@ -1,12 +1,14 @@
 {
-  "name": "Python 3",
-  "image": "mcr.microsoft.com/devcontainers/python:2-3.12-bullseye",
-  // TODO
-  // "features": {
-  //   "ghcr.io/devcontainers-extra/features/uv:1.0.1": {}
-  // }
-  "forwardPorts": [8000],
-  "postCreateCommand": "curl -LsSf https://astral.sh/uv/install.sh | sh",
-  "remoteUser": "vscode",
-  "containerUser": "vscode"
+    "name": "Python 3",
+    "image": "mcr.microsoft.com/devcontainers/python:2-3.12-bullseye",
+    // TODO
+    // "features": {
+    //     "ghcr.io/devcontainers-extra/features/uv:1.0.1": {}
+    // },
+    "forwardPorts": [
+        8000
+    ],
+    "postCreateCommand": "curl -LsSf https://astral.sh/uv/install.sh | sh && uv sync",
+    "remoteUser": "vscode",
+    "containerUser": "vscode"
 }
