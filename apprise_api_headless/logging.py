@@ -1,5 +1,7 @@
 import logging
 
+logger = logging.getLogger("apprise_api_headless")
+
 
 class AccessFilter(logging.Filter):
     def filter(self, record: logging.LogRecord) -> bool:
