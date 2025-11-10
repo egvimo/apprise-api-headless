@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class StatusResponse(BaseModel):
@@ -9,7 +9,7 @@ class StatusResponse(BaseModel):
 
 class NotifyRequest(BaseModel):
     title: Optional[str] = None
-    body: str
+    body: str = Field(..., min_length=1)
     tag: Optional[str] = "all"
 
 

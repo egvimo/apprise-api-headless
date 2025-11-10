@@ -80,6 +80,18 @@ def test_notify_with_missing_tag(httpserver: HTTPServer):
     assert len(httpserver.log) == 0
 
 
+def test_notify_with_empty_body(httpserver: HTTPServer):
+    with TestClient(app) as client:
+        response = client.post("/notify/test", json={"body": ""})
+        assert response.status_code == 422
+        assert (
+            response.json()["detail"][0]["msg"]
+            == "String should have at least 1 character"
+        )
+
+    assert len(httpserver.log) == 0
+
+
 def test_notify_with_title_and_tag(httpserver: HTTPServer):
     with TestClient(app) as client:
         response = client.post(
