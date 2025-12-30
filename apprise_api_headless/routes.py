@@ -3,11 +3,16 @@ from typing import Annotated, Optional
 from apprise import Apprise
 from fastapi import APIRouter, Body, HTTPException, Query, Request, status
 
-from apprise_api_headless.alertmanager import format_alert_for_notification
+from apprise_api_headless.alertmanager import convert_alert
 from apprise_api_headless.apprise import get_apprise_instance
 from apprise_api_headless.config import Settings
 from apprise_api_headless.logging import logger
-from apprise_api_headless.models import AlertmanagerRequest, NotifyRequest, NotifyResponse, StatusResponse
+from apprise_api_headless.models import (
+    AlertmanagerRequest,
+    NotifyRequest,
+    NotifyResponse,
+    StatusResponse,
+)
 
 router = APIRouter()
 
@@ -90,7 +95,7 @@ async def post_alertmanager(
         logger.error(msg)
         raise HTTPException(status_code=404, detail=msg)
 
-    title, body = format_alert_for_notification(alertmanager_request)
+    title, body = convert_alert(alertmanager_request)
 
     result = await apprise_instance.async_notify(title=title, body=body, tag=tag)
 

@@ -1,40 +1,7 @@
-from pathlib import Path
-
-import pytest
 from fastapi.testclient import TestClient
 from pytest_httpserver import HTTPServer
 
 from apprise_api_headless.main import app
-
-
-def config(host: str, port: int) -> str:
-    return (
-        f"urls:\n"
-        f"- 'json://{host}:{port}/tag':\n"
-        f"  - tag: tag\n"
-        f"- 'json://{host}:{port}/no-tag'\n"
-    )
-
-
-def failing_config(host: str, port: int) -> str:
-    return config(host, port) + (
-        f"- 'json://{host}:{port}/fail':\n"
-        f"  - tag: fail\n"
-    )  # fmt: skip
-
-
-@pytest.fixture(autouse=True)
-def apprise_config(httpserver: HTTPServer):
-    httpserver.expect_request("/tag").respond_with_json({"result": "ok"})
-    httpserver.expect_request("/no-tag").respond_with_json({"result": "ok"})
-
-    with TestClient(app) as client:
-        config_dir = Path(client.app.state.settings.apprise_config_dir)
-        config_dir.mkdir(parents=True, exist_ok=True)
-        with open(config_dir / "test.yml", "w") as file:
-            file.write(config(httpserver.host, httpserver.port))
-        with open(config_dir / "test-fail.yml", "w") as file:
-            file.write(failing_config(httpserver.host, httpserver.port))
 
 
 def test_notify_success(httpserver: HTTPServer):

@@ -3,9 +3,11 @@ from typing import Optional
 from apprise_api_headless.models import AlertmanagerRequest
 
 
-def format_alert_for_notification(payload: AlertmanagerRequest) -> tuple[Optional[str], str]:
+def convert_alert(
+    payload: AlertmanagerRequest,
+) -> tuple[Optional[str], str]:
     """
-    Convert Alertmanager payload to title and body for notification.
+    Convert Alertmanager webhook payload to title and body for notification.
 
     Returns:
         Tuple of (title, body)
@@ -42,7 +44,13 @@ def format_alert_for_notification(payload: AlertmanagerRequest) -> tuple[Optiona
 
     # Add labels
     if alert.labels:
-        labels_str = ", ".join([f"{k}={v}" for k, v in alert.labels.items() if k not in ["alertname", "severity"]])
+        labels_str = ", ".join(
+            [
+                f"{k}={v}"
+                for k, v in alert.labels.items()
+                if k not in ["alertname", "severity"]
+            ]
+        )
         if labels_str:
             body_parts.append(f"Labels: {labels_str}")
 
