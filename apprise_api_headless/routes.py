@@ -13,6 +13,7 @@ from apprise_api_headless.models import (
     NotifyResponse,
     StatusResponse,
 )
+from apprise_api_headless.utils import parse_tag_expression
 
 router = APIRouter()
 
@@ -41,7 +42,7 @@ async def post_notify(
     config_key: str, request: Request, notify_request: Annotated[NotifyRequest, Body()]
 ):
     settings: Settings = request.app.state.settings
-    apprise_instance: Apprise = get_apprise_instance(
+    apprise_instance: Apprise | None = get_apprise_instance(
         settings.apprise_config_dir, config_key
     )
 
@@ -49,8 +50,9 @@ async def post_notify(
         msg = f"Apprise config {config_key} not found in {settings.apprise_config_dir}"
         raise HTTPException(status_code=404, detail=msg)
 
+    tags = parse_tag_expression(notify_request.tag)
     result = await apprise_instance.async_notify(
-        title=notify_request.title, body=notify_request.body, tag=notify_request.tag
+        title=notify_request.title, body=notify_request.body, tag=tags
     )
 
     if not result:
@@ -86,7 +88,7 @@ async def post_alertmanager(
         tag: Optional tag to use for notifications
     """
     settings: Settings = request.app.state.settings
-    apprise_instance: Apprise = get_apprise_instance(
+    apprise_instance: Apprise | None = get_apprise_instance(
         settings.apprise_config_dir, config_key
     )
 
@@ -96,8 +98,8 @@ async def post_alertmanager(
         raise HTTPException(status_code=404, detail=msg)
 
     title, body = convert_alert(alertmanager_request)
-
-    result = await apprise_instance.async_notify(title=title, body=body, tag=tag)
+    tags = parse_tag_expression(tag)
+    result = await apprise_instance.async_notify(title=title, body=body, tag=tags)
 
     if not result:
         msg = "One or more notification could not be sent"

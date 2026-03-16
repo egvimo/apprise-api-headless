@@ -1,5 +1,8 @@
+import pytest
 from fastapi.testclient import TestClient
 from pytest_httpserver import HTTPServer
+
+from tests.conftest import request_paths
 
 
 def test_notify_success(client: TestClient, httpserver: HTTPServer):
@@ -85,3 +88,32 @@ def test_notify_with_failing_url_and_tag(client: TestClient, httpserver: HTTPSer
     response = client.post("/notify/test-fail", json={"body": "body", "tag": "fail"})
     assert response.status_code == 424
     assert len(httpserver.log) == 1
+
+
+@pytest.mark.parametrize(
+    "expression,expected_paths,status",
+    [
+        ("a", {"/a", "/a-c"}, 200),
+        ("b", {"/b", "/b-c"}, 200),
+        ("c", {"/a-c", "/b-c"}, 200),
+        ("a c", {"/a-c"}, 200),  # AND
+        ("b c", {"/b-c"}, 200),  # AND
+        ("a, b", {"/a", "/b", "/a-c", "/b-c"}, 200),  # OR
+        ("a c, b", {"/a-c", "/b", "/b-c"}, 200),  # (A AND C) OR B
+        ("a b", set(), 424),  # impossible AND
+    ],
+)
+def test_tag_expression(
+    client: TestClient,
+    httpserver: HTTPServer,
+    expression: str,
+    expected_paths: set[str],
+    status: int,
+):
+    response = client.post(
+        "/notify/test-tags",
+        json={"body": "body", "tag": expression},
+    )
+
+    assert response.status_code == status
+    assert request_paths(httpserver) == expected_paths
